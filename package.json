@@ -1,0 +1,31 @@
+{
+  "name": "pomegranate-cli",
+  "version": "0.0.0",
+  "description": "The Command Line Interface for the Pomegranate Framework",
+  "main": "index.js",
+  "bin": {
+    "pom": "./index.js"
+  },
+  "scripts": {
+    "prepublishOnly": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Pomegranate/Pomegranate-cli.git"
+  },
+  "keywords": [
+    "Pomegranate",
+    "CLI"
+  ],
+  "author": "Jim Bulkowski <jim.b@paperelectron.com> (http://paperelectron.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Pomegranate/Pomegranate-cli/issues"
+  },
+  "homepage": "https://github.com/Pomegranate/Pomegranate-cli#readme",
+  "dependencies": {
+    "typescript": "^3.3.4000",
+    "yargs": "^13.2.2"
+  }
+}
