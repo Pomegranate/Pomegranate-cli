@@ -3,6 +3,13 @@
   "version": "0.0.1",
   "description": "The Command Line Interface for the Pomegranate Framework",
   "main": "index.js",
+  "files": [
+    "CLI/**/*",
+    "index.d.ts",
+    "index.js.map",
+    "Readme.md",
+    "LICENCE"
+  ],
   "bin": {
     "pom": "./index.js"
   },
@@ -25,7 +32,23 @@
   },
   "homepage": "https://github.com/Pomegranate/Pomegranate-cli#readme",
   "dependencies": {
+    "@pomegranate/plugin-tools": "^0.0.10",
+    "@types/bluebird": "^3.5.26",
+    "@types/fs-extra": "^5.0.5",
+    "@types/lodash": "^4.14.123",
+    "@types/node": "^11.11.5",
+    "bluebird": "^3.5.3",
+    "fs-extra": "^7.0.1",
+    "handlebars": "^4.1.1",
+    "lodash": "^4.17.11",
+    "lodash-fun": "^1.6.1",
+    "stringify-object": "^3.3.0",
     "typescript": "^3.3.4000",
     "yargs": "^13.2.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.11",
+    "jest": "^24.5.0",
+    "ts-jest": "^24.0.0"
   }
 }
