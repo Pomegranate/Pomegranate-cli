@@ -8,9 +8,10 @@
 import {Argv} from "yargs";
 import {join}  from 'path'
 import {fork} from 'child_process'
+import {buildProject} from "../application/handlers/project";
 
 
-export const startPomegranate = () => {
+export const startPomegranate = (cwd, Config, Plugins) => {
   return {
       command: 'start [path]',
       describe: 'Starts a Pomegranate application',
@@ -24,6 +25,19 @@ export const startPomegranate = () => {
             defaultDescription: 'Defaults to process.cwd()',
             type: 'string'
           })
+          .option('b', {
+              alias: 'build',
+              description: 'Builds the project before starting.',
+              default: false,
+              type: 'boolean'
+            })
+          .option('c', {
+            alias: 'clean',
+            description: 'Cleans the build directory. Requires --b / -build option.',
+            default: false,
+            implies: 'build',
+            type: 'boolean'
+          })
           .option('f', {
             alias: 'file',
             description: 'Pom startup file',
@@ -33,7 +47,11 @@ export const startPomegranate = () => {
           })
           .usage('Usage: $0 start [path]')
       },
-      handler: (argv) => {
+      handler: async (argv) => {
+        if(argv.build){
+          let builder = await buildProject(cwd, Config, Plugins)
+          await builder(argv)
+        }
         delete process.env.POM_COMMAND_MODE
         let file = join(argv.path, argv.file)
         fork(file)

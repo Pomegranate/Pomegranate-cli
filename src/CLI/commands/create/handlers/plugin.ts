@@ -13,7 +13,7 @@ import {fqParentName, getFqParentname} from "@pomegranate/plugin-tools";
 import {template as ApplicationTsClean} from '../templates/generators/ts/TsApplicationPlugin'
 import {template as CommandTsClean} from '../templates/generators/ts/TsCommandPlugin'
 import {template as CompositeTsClean} from '../templates/generators/ts/TsCompositePlugin'
-import {template as EffectTsClean} from '../templates/generators/ts/TsEffectPlugin'
+import {template as ActionTsClean} from '../templates/generators/ts/TsActionPlugin'
 import {template as InjectableTsClean} from '../templates/generators/ts/TsInjectablePlugin'
 import {template as LoghandlerTsClean} from '../templates/generators/ts/TsLoghandlerPlugin'
 
@@ -28,6 +28,7 @@ import {getConfigFilePath, configObjectPath, configPath} from '@pomegranate/plug
 import {pathExists, outputFile, ensureDir} from "fs-extra";
 import {join, relative} from 'path'
 import {switchWith} from "lodash-fun";
+
 
 
 const ensurePlugin = (baseDir, path, contents, force) => {
@@ -51,6 +52,26 @@ const ensurePlugin = (baseDir, path, contents, force) => {
 
 
 const templateChoices = {
+  action: {
+    ts: {
+      comments: null,
+      clean:  compile(ActionTsClean)
+    },
+    js: {
+      comments:null,
+      clean: null
+    }
+  },
+  anything: {
+    ts: {
+      comments: null,
+      clean: compile(InjectableTsClean)
+    },
+    js: {
+      comments: null,
+      clean: compile(InjectableJsClean)
+    }
+  },
   application: {
     ts: {
       comments: null,
@@ -75,24 +96,24 @@ const templateChoices = {
   composite: {
     ts: {
       comments: null,
-      clean:  compile(CompositeTsClean)
+      clean: compile(InjectableTsClean)
     },
     js: {
-      comments:null,
-      clean: null
+      comments: null,
+      clean: compile(InjectableJsClean)
     }
   },
-  effect: {
+  factory: {
     ts: {
       comments: null,
-      clean:  compile(EffectTsClean)
+      clean: compile(InjectableTsClean)
     },
     js: {
-      comments:null,
-      clean: null
+      comments: null,
+      clean: compile(InjectableJsClean)
     }
   },
-  injectable: {
+  instance: {
     ts: {
       comments: null,
       clean: compile(InjectableTsClean)
@@ -111,24 +132,41 @@ const templateChoices = {
       comments: null,
       clean: null
     }
+  },
+  merge: {
+    ts: {
+      comments: null,
+      clean: compile(InjectableTsClean)
+    },
+    js: {
+      comments: null,
+      clean: compile(InjectableJsClean)
+    }
+  },
+  override: {
+    ts: {
+      comments: null,
+      clean: compile(LoghandlerTsClean)
+    },
+    js: {
+      comments: null,
+      clean: null
+    }
   }
-
-
 
 }
 
-export const buildPlugin = (cwd, Pomegranate, FutureConfigState) => {
+export const buildPlugin = (cwd, Config, Plugins) => {
   return async (argv) => {
-    let ProjectConfig = await FutureConfigState.getState()
-    let baseDirectory = get('baseDirectory', ProjectConfig)
+    let baseDirectory = get('baseDirectory', Config)
     let fqbd = baseDirectory ? baseDirectory : argv.path
 
     // console.log(argv)
-    let chooseTemplatePath = `${argv.builder}.${argv.language}.${argv.comments ? 'comments' : 'clean'}`
+    let chooseTemplatePath = `${argv.type}.${argv.language}.${argv.comments ? 'comments' : 'clean'}`
     let templateCompiler = get(chooseTemplatePath, templateChoices)
 
     if(!templateCompiler){
-      console.log(`builder: ${argv.builder}, lang: ${argv.language}, output: ${argv.comments ? 'comments' : 'clean'}`)
+      console.log(`builder: ${argv.type}, lang: ${argv.language}, output: ${argv.comments ? 'comments' : 'clean'}`)
       console.log('No match for that input combination found. Probably not implemented yet.')
       return
     }

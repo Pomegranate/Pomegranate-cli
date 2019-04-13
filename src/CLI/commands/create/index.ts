@@ -7,10 +7,10 @@
 import yargs from 'yargs'
 import Bluebird from 'bluebird'
 import {get, getOr} from 'lodash/fp'
-import {buildConfigs} from "./handlers/configs";
-import {buildProject} from "./handlers/project"
 import {buildPlugin} from "./handlers/plugin";
 import {relative} from 'path'
+
+export const buildableTypes = ['action', 'anything', 'application', 'command', 'composite', 'factory', 'instance', 'loghandler', 'merge', 'override']
 
 export const command = 'build <path>'
 export const describe = 'Builds Pomegranate app at <path>'
@@ -26,10 +26,9 @@ export const handler = (argv) => {
 }
 
 
-export async function buildPomegranate(cwd, Pomegranate, FutureConfigState) {
-  let ProjectConfig = await FutureConfigState.getState()
-  let projectDir = get('projectPluginDirectory', ProjectConfig)
-  let baseDir = get('baseDirectory', ProjectConfig)
+export async function pomegranateCreate(cwd, Config, Plugins) {
+  let projectDir = get('projectPluginDirectory', Config)
+  let baseDir = get('baseDirectory', Config)
   let defaultPluginDir
   try {
     defaultPluginDir = relative(baseDir, projectDir)
@@ -39,20 +38,20 @@ export async function buildPomegranate(cwd, Pomegranate, FutureConfigState) {
   }
 
   return {
-    command: 'build',
-    aliases: 'b',
-    describe: 'generative commands for Pomegranate',
+    command: 'create',
+    aliases: 'c',
+    describe: 'Generative commands for Pomegranate.',
     builder: (yargs) => {
       return yargs
         .command({
-          command: 'plugin <builder> <name>',
+          command: 'plugin <type> <name>',
           aliases: 'pl',
           describe: 'Creates a new local Pomegranate plugin',
           builder: (yargs) => {
             yargs
-              .positional('builder', {
-                describe: 'The type of builder to use',
-                choices: ['application','command','composite','effect','injectable','loghandler'],
+              .positional('type', {
+                describe: 'The type plugin to create',
+                choices: buildableTypes,
                 type: 'string'
               })
               .positional('name', {
@@ -85,41 +84,7 @@ export async function buildPomegranate(cwd, Pomegranate, FutureConfigState) {
                 type: 'boolean'
               })
           },
-          handler: buildPlugin(cwd, Pomegranate, FutureConfigState)
-        })
-        .command({
-          command: 'config',
-          aliases: 'c',
-          describe: 'Creates pomegranate plugin configurations',
-          builder: (yargs) => {
-            yargs.option('e', {
-              alias: 'env',
-              default: 'false',
-              type: 'boolean'
-            })
-          },
-          handler: buildConfigs(cwd, Pomegranate, FutureConfigState)
-        })
-        .command({
-          command: 'project',
-          aliases: 'p',
-          describe: 'Builds the current project with TypeScript',
-          builder: (yargs) => {
-            yargs
-              .options('c', {
-                alias: 'clean',
-                description: 'Removes and recreates build directory before compile.',
-                default: false,
-                boolean: true
-              })
-              .options('w', {
-                alias: 'watch',
-                description: 'Watches the project directory for changes.',
-                default: false,
-                boolean: true
-              })
-          },
-          handler: buildProject(cwd, Pomegranate, FutureConfigState)
+          handler: buildPlugin(cwd, Config, Plugins)
         })
         .help()
     },

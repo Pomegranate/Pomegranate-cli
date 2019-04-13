@@ -9,7 +9,8 @@
 import {cloneDeep} from 'lodash/fp'
 import {join} from 'path'
 import {startPomegranate} from "./CLI/commands/start"
-import {buildPomegranate} from "./CLI/commands/build"
+import {pomegranateApplication} from "./CLI/commands/application";
+import {pomegranateCreate} from "./CLI/commands/create"
 import {initPomegranate} from "./CLI/commands/init"
 import {Argv} from "yargs"
 import {pluginCommands} from "./CLI/commands/plugin";
@@ -21,6 +22,8 @@ const initialFile = join(cwd, 'pom.js')
 
 let Pomegranate
 const strapPom = async function(){
+  let Config
+  let Plugins
   let cliData
   let futureState
   let PomSettings
@@ -29,6 +32,7 @@ const strapPom = async function(){
     Pomegranate = require(initialFile)
   }
   catch(e){
+    console.log(e)
     console.log('No pom.js file found.')
   }
 
@@ -36,18 +40,23 @@ const strapPom = async function(){
     if (Pomegranate) {
       let clonedSettings = cloneDeep(Pomegranate.PomSettings)
       clonedSettings.logLevel = 0
-      futureState = await Pomegranate.Pomegranate.RunCLI(cwd, clonedSettings)
-      console.log(futureState)
+      let localApp = await Pomegranate.Pomegranate.RunCLI(cwd, clonedSettings)
+      Config = localApp.Config
+      Plugins = localApp.Plugins
+
+
     }
   } catch(e){
+    console.log(e)
     console.log(`Pomegranate in current working directory is unavailable or has errors. 
     Commands which rely on the current state of your application may be unavailable.`)
   }
   yargs
     .command(initPomegranate())
-    .command(await pluginCommands(cwd, Pomegranate, futureState))
-    .command(await buildPomegranate(cwd, Pomegranate, futureState))
-    .command(startPomegranate())
+    .command(await pluginCommands(cwd, Config, Plugins))
+    .command(await pomegranateApplication(cwd, Config, Plugins))
+    .command(await pomegranateCreate(cwd, Config, Plugins))
+    .command(startPomegranate(cwd, Config, Plugins))
     .demandCommand(1, 'You must provide at least one command.')
     .recommendCommands()
     .strict()

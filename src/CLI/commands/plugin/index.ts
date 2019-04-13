@@ -13,34 +13,32 @@
  */
 import Bluebird from 'bluebird'
 import {joinFqShortname, getFqShortname, fqDeclaredName} from "@pomegranate/plugin-tools";
-import {map, toLower, first, get, filter, each} from 'lodash/fp'
+import {map, toLower, first, get, filter, each, isFunction, isObject} from 'lodash/fp'
 import {Argv} from "yargs";
 import yargs from 'yargs'
 
-export async function pluginCommands(cwd, Pomegranate, FutureConfigState){
+export async function pluginCommands(cwd, Config, Plugins){
 
-  let {Plugins} = await Pomegranate.Pomegranate.CliPlugins(FutureConfigState)
-  // let plugins = get('Plugins', PomInstance)
-  let commands = map((plugin: any) => {
+  let commands = await Bluebird.all(map(async (plugin: any) => {
     // console.log(toLower(first(fqShortName(plugin.configuration.name))))
     let Injector = get('injector', plugin)
     let commandFunction = get('commands', plugin)
     return {
       pluginName: getFqShortname(plugin),
-      commandRoot: toLower(fqDeclaredName(plugin.configuration.name)),
-      builderFn: Injector.inject(commandFunction)
+      commandRoot: toLower(getFqShortname(plugin)),
+      builderFn: await Injector.inject(commandFunction)
     }
-  }, filter(plugin => plugin.commands,Plugins))
+  }, filter(plugin => plugin.commands,Plugins)))
+
   return {
     command: 'plugin',
-    describe: 'Runs Plugin stuff',
+    describe: 'Plugin provided commands.',
     aliases: 'p',
     builder: (yargs: Argv) => {
       yargs
         .usage('usage: $0 plugin [cmd]')
 
       each((pluginCommander) => {
-        // yargs.command(pluginCommander.commandRoot, `${pluginCommander.pluginName} Commands`,pluginCommander.builderFn)
         yargs.command({
           command: pluginCommander.commandRoot,
           describe: `${pluginCommander.pluginName} Commands`,
@@ -49,7 +47,9 @@ export async function pluginCommands(cwd, Pomegranate, FutureConfigState){
             yargs.showHelp()
           }
         })
-      }, commands)
+      // }, filter((plugin) => {return isFunction(plugin.builderFn)}, commands))
+      }, filter((plugin) => {return isFunction(plugin.builderFn)}, commands))
+
 
       return yargs
         .help()

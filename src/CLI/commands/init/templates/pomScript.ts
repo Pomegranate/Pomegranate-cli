@@ -9,13 +9,11 @@ export const template = `
 
 'use strict';
 
-// WARNING CHANGE BEFORE RELEASE
-//
 const Pomegranate = require('pomegranate')
 const PomSettings = require('./PomegranateSettings')
 
 async function startPomegranate(){
-  const Pom = await Pomegranate.RunPomegranate(PomSettings)
+  const Pom = await Pomegranate.Run(PomSettings)
   Pom.start()
 }
 

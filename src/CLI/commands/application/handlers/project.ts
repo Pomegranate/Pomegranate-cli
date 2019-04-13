@@ -124,7 +124,7 @@ function compile(fileNames: string[], options: ts.CompilerOptions): void {
 
   allDiagnostics.forEach(diagnostic => {
     if (diagnostic.file) {
-      let { line, character } = diagnostic.file.getLineAndCharacterOfPosition(
+      let {line, character} = diagnostic.file.getLineAndCharacterOfPosition(
         diagnostic.start!
       );
       let message = ts.flattenDiagnosticMessageText(
@@ -144,20 +144,22 @@ function compile(fileNames: string[], options: ts.CompilerOptions): void {
   let exitCode = emitResult.emitSkipped ? 1 : 0;
   // console.log(`Process exiting with code '${exitCode}'.`);
   let fileCount = fileNames.length
-  console.log(`Compiled ${fileCount} ${fileCount > 1 ? 'files': 'file'}.`)
-  process.exit(exitCode);
+  console.log(`Compiled ${fileCount} ${fileCount > 1 ? 'files' : 'file'}.`)
+  // process.exit(exitCode);
+  if(exitCode > 0){
+    process.exit(exitCode)
+  }
 }
 
 
-export const buildProject = (cwd, Pomegranate, FutureConfigState) => {
+export const buildProject = (cwd, Config, Plugins) => {
   return async (argv) => {
-    let Config = await FutureConfigState.getState()
 
-    if(argv.clean){
+    if (argv.clean) {
       console.log('Cleaning build directory')
       await emptyDir(Config.buildDirectory)
     }
-    if(argv.watch){
+    if (argv.watch) {
     }
 
     let pluginFiles = PluginFileHandler(Config.projectPluginDirectory)
@@ -177,12 +179,12 @@ export const buildProject = (cwd, Pomegranate, FutureConfigState) => {
     let outputConfigs = PluginFileHandler(configOut)
 
     let files = [
-      ... await outputPlugin.fileListDeep({ext: '.ts'}),
-      ... await outputApplication.fileListDeep({ext: '.ts'}),
-      ... await outputConfigs.fileListDeep({ext: '.ts'})
+      ...await outputPlugin.fileListDeep({ext: '.ts'}),
+      ...await outputApplication.fileListDeep({ext: '.ts'}),
+      ...await outputConfigs.fileListDeep({ext: '.ts'})
     ]
 
     compile(files, defaultTsOpts)
 
-    }
+  }
 }
