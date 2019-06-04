@@ -6,7 +6,7 @@
  * @project pomegranate-cli
  * @license MIT {@link http://opensource.org/licenses/MIT}
  */
-import {cloneDeep} from 'lodash/fp'
+import {cloneDeep, filter, each, isNull} from 'lodash/fp'
 import {join} from 'path'
 import {startPomegranate} from "./CLI/commands/start"
 import {pomegranateApplication} from "./CLI/commands/application";
@@ -21,7 +21,7 @@ const cwd = process.cwd()
 const initialFile = join(cwd, 'pom.js')
 
 let Pomegranate
-const strapPom = async function(){
+const strapPom = async function () {
   let Config
   let Plugins
   let cliData
@@ -30,33 +30,49 @@ const strapPom = async function(){
   try {
     process.env.POM_COMMAND_MODE = '1'
     Pomegranate = require(initialFile)
-  }
-  catch(e){
-    console.log(e)
+  } catch (e) {
     console.log('No pom.js file found.')
   }
 
   try {
     if (Pomegranate) {
+
       let clonedSettings = cloneDeep(Pomegranate.PomSettings)
       clonedSettings.logLevel = 0
       let localApp = await Pomegranate.Pomegranate.RunCLI(cwd, clonedSettings)
-      Config = localApp.Config
+      Config = localApp.FrameworkConfiguration
+      // Config = localApp.Config
       Plugins = localApp.Plugins
 
 
     }
-  } catch(e){
-    console.log(e)
+  } catch (e) {
+    // console.log(e.message)
     console.log(`Pomegranate in current working directory is unavailable or has errors. 
     Commands which rely on the current state of your application may be unavailable.`)
   }
+
+  let handlers = [
+    initPomegranate(),
+    await pluginCommands(cwd, Config, Plugins),
+    await pomegranateApplication(cwd, Config, Plugins),
+    await pomegranateCreate(cwd, Config, Plugins),
+    startPomegranate(cwd, Config, Plugins)
+  ]
+
+  each((handler) => {
+      yargs.command(handler)
+    },
+    filter((handler) => {
+      return !isNull(handler)
+    }, handlers))
+
   yargs
-    .command(initPomegranate())
-    .command(await pluginCommands(cwd, Config, Plugins))
-    .command(await pomegranateApplication(cwd, Config, Plugins))
-    .command(await pomegranateCreate(cwd, Config, Plugins))
-    .command(startPomegranate(cwd, Config, Plugins))
+  // .command(initPomegranate())
+  // .command(await pluginCommands(cwd, Config, Plugins))
+  // .command(await pomegranateApplication(cwd, Config, Plugins))
+  // .command(await pomegranateCreate(cwd, Config, Plugins))
+  // .command(startPomegranate(cwd, Config, Plugins))
     .demandCommand(1, 'You must provide at least one command.')
     .recommendCommands()
     .strict()

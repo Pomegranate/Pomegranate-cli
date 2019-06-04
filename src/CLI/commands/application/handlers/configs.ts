@@ -90,24 +90,26 @@ const ensurePluginConfig = (baseDir,path,contents) => {
 }
 
 export const buildConfigs = (cwd, Config, Plugins) => {
+  let {buildDirs, projectDirs} = Config.transformedValues()
   return async (argv) => {
-    // let plugins = await Pomegranate.Pomegranate.CliPlugins(futureState)
-    // console.log(plugins)
 
     let templateCompiler = argv.env ? compileFnFile : compileObjFile
 
     let creationTime = new Date().toDateString()
     let confs = reduce((acc, plugin) => {
       let pushPropPath = configObjectPath(plugin)
-      let confPath = `${join(Config.projectPluginConfigDirectory, getConfigFilePath(plugin))}.js`
+
+      let confPath = `${join(projectDirs.pluginConfigDirectory, getConfigFilePath(plugin))}.js`
+
       if (!has(confPath, acc)) {
         acc[confPath] = {
           configuration: {},
-          baseDir: plugin.baseDirectory,
-          projectDirectory: plugin.projectDirectory,
+          baseDir: plugin.computedMetadata.baseDirectory,
+          projectDirectory: plugin.computedMetadata.projectDirectory,
           pluginName: getFqParentname(plugin)
         }
       }
+
       acc[confPath].directories = acc[confPath].directories || []
       acc[confPath].directories = concat(acc[confPath].directories,map(([k, v])=> v, toPairs(plugin.projectDirectories)))
 

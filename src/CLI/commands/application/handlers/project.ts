@@ -153,26 +153,31 @@ function compile(fileNames: string[], options: ts.CompilerOptions): void {
 
 
 export const buildProject = (cwd, Config, Plugins) => {
+  let {buildDirs, projectDirs} = Config.transformedValues()
   return async (argv) => {
 
     if (argv.clean) {
       console.log('Cleaning build directory')
-      await emptyDir(Config.buildDirectory)
+      await emptyDir(buildDirs.base)
     }
     if (argv.watch) {
+
     }
+    // let pluginFiles = PluginFileHandler(Config.projectPluginDirectory)
+    let pluginFiles = PluginFileHandler(projectDirs.pluginDirectory)
+    // let applicationFiles = PluginFileHandler(Config.projectApplicationDirectory)
+    let applicationFiles = PluginFileHandler(projectDirs.applicationDirectory)
+    // let configFiles = PluginFileHandler(Config.projectPluginConfigDirectory)
+    let configFiles = PluginFileHandler(projectDirs.pluginConfigDirectory)
 
-    let pluginFiles = PluginFileHandler(Config.projectPluginDirectory)
-    let applicationFiles = PluginFileHandler(Config.projectApplicationDirectory)
-    let configFiles = PluginFileHandler(Config.projectPluginConfigDirectory)
+    let pluginOut = join(buildDirs.base, pluginFiles.baseName)
+    let applicationOut = join(buildDirs.base, applicationFiles.baseName)
+    let configOut = join(buildDirs.base, configFiles.baseName)
 
-    let pluginOut = join(Config.buildDirectory, pluginFiles.baseName)
-    let applicationOut = join(Config.buildDirectory, applicationFiles.baseName)
-    let configOut = join(Config.buildDirectory, configFiles.baseName)
+    await copy(projectDirs.pluginDirectory, pluginOut)
+    await copy(projectDirs.applicationDirectory, applicationOut)
+    await copy(projectDirs.pluginConfigDirectory, configOut)
 
-    await copy(Config.projectPluginDirectory, pluginOut)
-    await copy(Config.projectApplicationDirectory, applicationOut)
-    await copy(Config.projectPluginConfigDirectory, configOut)
 
     let outputPlugin = PluginFileHandler(pluginOut)
     let outputApplication = PluginFileHandler(applicationOut)

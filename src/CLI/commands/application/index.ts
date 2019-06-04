@@ -12,14 +12,21 @@ import {buildProject} from "./handlers/project"
 import {relative} from 'path'
 
 export async function pomegranateApplication(cwd, Config, Plugins) {
+  try {
+    let f = Config.transformedValues
+  }
+  catch(e){
+    return null
+  }
+  let {buildDirs, projectDirs} = Config.transformedValues()
   let projectDir = get('projectPluginDirectory', Config)
   let baseDir = get('baseDirectory', Config)
   let defaultPluginDir
   try {
-    defaultPluginDir = relative(baseDir, projectDir)
+    // defaultPluginDir = relative(baseDir, projectDir)
   }
   catch(e){
-    console.log('Unable to determine project plugin directory, plugin generation commands are unavailable.')
+    console.log('Unable to determine project plugin directory, application commands are unavailable.')
   }
 
   return {

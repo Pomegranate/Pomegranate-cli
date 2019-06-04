@@ -12,6 +12,13 @@ import {buildProject} from "../application/handlers/project";
 
 
 export const startPomegranate = (cwd, Config, Plugins) => {
+  try {
+    let f = Config.transformedValues
+  }
+  catch(e){
+    return null
+  }
+
   return {
       command: 'start [path]',
       describe: 'Starts a Pomegranate application',

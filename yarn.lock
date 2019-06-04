@@ -276,14 +276,16 @@
     "@types/istanbul-lib-coverage" "^1.1.0"
     "@types/yargs" "^12.0.9"
 
-"@pomegranate/plugin-tools@^1.2.2":
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/@pomegranate/plugin-tools/-/plugin-tools-1.2.2.tgz#4d84adcf50acdbae89572c99137c5c3315c70533"
-  integrity sha512-9jz6Q02tCjMq/2Dxd8doaOzVJGUup9xq67R82FvQykEEoB0+GiRKSX6DoXTO17C3/duneU4a9q4L1zFEifs1yA==
+"@pomegranate/plugin-tools@^2.0.7":
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/@pomegranate/plugin-tools/-/plugin-tools-2.0.7.tgz#d5dd6a091012906c431796b50213dee5687ea234"
+  integrity sha512-MPE0smla198bCZzw+fkwPZRk7rQ/yxKYtdyYLTyjNZZbJ8GPph8e6NcTvGFLcCHPuh71q1XCHLFUwGKGczdaIg==
   dependencies:
+    "@types/lodash" "^4.14.123"
     bluebird "^3.5.3"
     fs-extra "^7.0.1"
     lodash "^4.17.11"
+    lodash-fun "^1.7.0"
 
 "@types/babel__core@^7.1.0":
   version "7.1.0"
@@ -2186,6 +2188,14 @@ lodash-fun@^1.6.1:
   version "1.6.1"
   resolved "https://registry.yarnpkg.com/lodash-fun/-/lodash-fun-1.6.1.tgz#3affb8604d6efd91e76c0605db6d46742fbe4836"
   integrity sha512-qwT/xM6RdwVs09S6X3dKJkpZvut9fgHeq6tAt7QS1AEdSLln7fBTkdHXajYTowp0LiyyTGrB7Xvbp8gXePxWyg==
+  dependencies:
+    bluebird "^3.5.3"
+    lodash "^4.17.11"
+
+lodash-fun@^1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/lodash-fun/-/lodash-fun-1.7.0.tgz#a78727a395b86ff7d3048751369161df8973d7b7"
+  integrity sha512-sH4jC1a8eyUVuEQ4CXM4KBegNo5eIna1komjgpuFWWm6g4+IEgqRJuALbpwfdl2c85YTiS9zFRbwaZKARcc/hA==
   dependencies:
     bluebird "^3.5.3"
     lodash "^4.17.11"

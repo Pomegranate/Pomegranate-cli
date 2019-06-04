@@ -27,11 +27,18 @@ export const handler = (argv) => {
 
 
 export async function pomegranateCreate(cwd, Config, Plugins) {
+  try {
+    let f = Config.transformedValues
+  }
+  catch(e){
+    return null
+  }
+  let {buildDirs, projectDirs} = Config.transformedValues()
   let projectDir = get('projectPluginDirectory', Config)
   let baseDir = get('baseDirectory', Config)
   let defaultPluginDir
   try {
-    defaultPluginDir = relative(baseDir, projectDir)
+    defaultPluginDir = projectDirs.pluginDirectory
   }
   catch(e){
     console.log('Unable to determine project plugin directory, plugin generation commands are unavailable.')

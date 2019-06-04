@@ -69,7 +69,7 @@ export const init = () => {
        ])
      })
      .then((result) => {
-       console.log(`Initialized Pomegranate app "${argv.name}" at \n   ${normalized}`)
+       console.log(`Initialized Pomegranate app "${argv.name}" at \n ${normalized}`)
        return null
      })
 

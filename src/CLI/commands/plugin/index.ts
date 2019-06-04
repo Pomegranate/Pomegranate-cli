@@ -19,16 +19,23 @@ import yargs from 'yargs'
 
 export async function pluginCommands(cwd, Config, Plugins){
 
+  try {
+    let f = Config.transformedValues
+  }
+  catch(e){
+    return null
+  }
+
   let commands = await Bluebird.all(map(async (plugin: any) => {
     // console.log(toLower(first(fqShortName(plugin.configuration.name))))
     let Injector = get('injector', plugin)
-    let commandFunction = get('commands', plugin)
+    let commandFunction = get('state.commands', plugin)
     return {
       pluginName: getFqShortname(plugin),
       commandRoot: toLower(getFqShortname(plugin)),
       builderFn: await Injector.inject(commandFunction)
     }
-  }, filter(plugin => plugin.commands,Plugins)))
+  }, filter(plugin => plugin.state.commands,Plugins)))
 
   return {
     command: 'plugin',
@@ -47,7 +54,6 @@ export async function pluginCommands(cwd, Config, Plugins){
             yargs.showHelp()
           }
         })
-      // }, filter((plugin) => {return isFunction(plugin.builderFn)}, commands))
       }, filter((plugin) => {return isFunction(plugin.builderFn)}, commands))
 
 
