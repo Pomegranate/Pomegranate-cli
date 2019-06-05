@@ -1,6 +1,6 @@
 {
   "name": "pomegranate-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The Command Line Interface for the Pomegranate Framework",
   "main": "index.js",
   "files": [
