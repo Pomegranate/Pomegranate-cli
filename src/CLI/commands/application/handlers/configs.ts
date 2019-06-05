@@ -114,7 +114,7 @@ export const buildConfigs = (cwd, Config, Plugins) => {
       acc[confPath].directories = concat(acc[confPath].directories,map(([k, v])=> v, toPairs(plugin.projectDirectories)))
 
       let fullConfig = set(pushPropPath('config'), {disabled: false, additionalDependencies: [],}, acc[confPath].configuration)
-      acc[confPath].configuration = set(pushPropPath('variables'), plugin.variables, fullConfig)
+      acc[confPath].configuration = set(pushPropPath('variables'), plugin.state.variables, fullConfig)
       return acc
     }, {}, Plugins)
 
